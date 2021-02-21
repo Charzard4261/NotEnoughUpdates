@@ -70,7 +70,9 @@ public class NEUConfig extends Config {
             case 5:
                 editOverlay(activeConfigCategory, OverlayManager.timersOverlay, miscOverlays.todoPosition);
                 return;
-
+            case 6:
+                editOverlay(activeConfigCategory, OverlayManager.cityProjectPinOverlay, miscOverlays.cityProjectPinPosition);
+                return;
         }
     }
 
@@ -1035,6 +1037,55 @@ public class NEUConfig extends Config {
         )
         @ConfigAccordionId(id = 0)
         public int todoStyle = 0;
+
+        // City Project Pin
+        @ConfigOption(
+                name = "City Project Pin Overlay",
+                desc = ""
+        )
+        @ConfigEditorAccordion(id = 1)
+        public boolean cityProjectPinAccordion = false;
+
+        @Expose
+        @ConfigOption(
+                name = "Enable Overlay",
+                desc = "Pin a City Project to your HUD and this will keep track of the items needed."
+        )
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 1)
+        public boolean cityProjectPinEnabled = true;
+
+        @Expose
+        @ConfigOption(
+                name = "Display Items",
+                desc = "Will attempt to search the local NEU Item Repo to display each item in the Pinned City Project."
+        )
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 1)
+        public boolean cityProjectPinDisplayItem = true;
+
+        @Expose
+        @ConfigOption(
+                name = "Overlay Position",
+                desc = "Change the position of the City Project Pin Overlay."
+        )
+        @ConfigEditorButton(
+                runnableId = 6,
+                buttonText = "Edit"
+        )
+        @ConfigAccordionId(id = 1)
+        public Position cityProjectPinPosition = new Position(10, 200);
+
+        @Expose
+        @ConfigOption(
+                name = "Overlay Style",
+                desc = "Change the style of the City Project Pin Overlay."
+        )
+        @ConfigEditorDropdown(
+                values = {"Background", "No Shadow", "Shadow", "Full Shadow"}
+        )
+        @ConfigAccordionId(id = 0)
+        public int cityProjectPinStyle = 0;
     }
 
     public static class EnchSolvers {

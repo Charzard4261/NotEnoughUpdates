@@ -15,6 +15,7 @@ public class OverlayManager {
     public static MiningOverlay miningOverlay;
     public static FarmingOverlay farmingOverlay;
     public static PetInfoOverlay petInfoOverlay;
+    public static CityProjectPinOverlay cityProjectPinOverlay;
     public static TimersOverlay timersOverlay;
     public static final List<TextOverlay> textOverlays = new ArrayList<>();
 
@@ -112,6 +113,33 @@ public class OverlayManager {
         textOverlays.add(miningOverlay);
         textOverlays.add(farmingOverlay);
         textOverlays.add(petInfoOverlay);
+
+
+        cityProjectPinOverlay = new CityProjectPinOverlay(NotEnoughUpdates.INSTANCE.config.miscOverlays.cityProjectPinPosition, () -> {
+            List<String> strings = new ArrayList<>();
+            strings.add("Project - Bartender's Brewery");
+            strings.add("  \u00a7aBuilding & Machinery");
+            strings.add("    \u00a7aEnchanted Birch Wood \u00a722\u00a7f/\u00a722");
+            strings.add("    \u00a7aEnchanted Iron \u00a7c0\u00a7f/\u00a721");
+            strings.add("  \u00a7aSugary Drinks");
+            strings.add("    \u00a7aEnchanted Sugar \u00a7c16\u00a7f/\u00a7232");
+            strings.add("    \u00a7fMagical Water Bucket \u00a7216\u00a7f/\u00a728");
+            strings.add("  \u00a7aSlavic Recipes");
+            strings.add("    \u00a7aEnchanted Potato \u00a7c60\u00a7f/\u00a7264");
+            strings.add("    \u00a7fMagical Water Bucket \u00a7216\u00a7f/\u00a728");
+            strings.add("  \u00a7aLabor");
+            strings.add("    \u00a7aEnchanted Clownfish \u00a7c2\u00a7f/\u00a724");
+            strings.add("    \u00a7aEnchanted Melon \u00a7264\u00a7f/\u00a7264");
+            strings.add("    \u00a7b100 Bits");
+            return strings;
+        }, () -> {
+            int style = NotEnoughUpdates.INSTANCE.config.miscOverlays.cityProjectPinStyle;
+            if(style >= 0 && style < TextOverlayStyle.values().length) {
+                return TextOverlayStyle.values()[style];
+            }
+            return TextOverlayStyle.BACKGROUND;
+        });
+        textOverlays.add(cityProjectPinOverlay);
 
     }
 
