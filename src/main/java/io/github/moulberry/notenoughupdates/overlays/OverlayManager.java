@@ -1,11 +1,13 @@
 package io.github.moulberry.notenoughupdates.overlays;
 
 import com.google.common.collect.Lists;
+import com.google.gson.JsonParser;
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates;
-import io.github.moulberry.notenoughupdates.core.config.Position;
 import io.github.moulberry.notenoughupdates.miscfeatures.PetInfoOverlay;
+import net.minecraft.item.ItemStack;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class OverlayManager {
@@ -113,7 +115,6 @@ public class OverlayManager {
         textOverlays.add(miningOverlay);
         textOverlays.add(farmingOverlay);
         textOverlays.add(petInfoOverlay);
-
 
         cityProjectPinOverlay = new CityProjectPinOverlay(NotEnoughUpdates.INSTANCE.config.miscOverlays.cityProjectPinPosition, () -> {
             List<String> strings = new ArrayList<>();
