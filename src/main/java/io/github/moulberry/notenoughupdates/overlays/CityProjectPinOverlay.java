@@ -1,5 +1,6 @@
 package io.github.moulberry.notenoughupdates.overlays;
 
+import com.google.gson.JsonObject;
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates;
 import io.github.moulberry.notenoughupdates.core.config.Position;
 import io.github.moulberry.notenoughupdates.util.Utils;
@@ -20,17 +21,18 @@ import java.util.function.Supplier;
 
 // Contributed by Charzard4261
 public class CityProjectPinOverlay extends TextOverlay {
-    public Project pin;
+    private Project pin;
     Project                    dummyProject;
-    HashMap<String, ItemStack> dummyRenderers;
-    ItemStack                  indent;
+    HashMap<String, ItemStack> dummyRenderers, scuffedRenderers;
+    ItemStack indent;
 
 
     public CityProjectPinOverlay(Position position, Supplier<List<String>> dummyStrings, Supplier<TextOverlayStyle> styleSupplier)
     {
         super(position, dummyStrings, styleSupplier);
-        pin = getDummyProject();
+        scuffedRenderers = new HashMap<>();
         overlayStrings = new ArrayList<>();
+        indent = new ItemStack(Items.painting, 1, 10);
     }
 
     public HashMap<String, ItemStack> getDummyRenderers()
@@ -38,7 +40,9 @@ public class CityProjectPinOverlay extends TextOverlay {
         if (dummyRenderers != null)
             return dummyRenderers;
 
-        indent = NotEnoughUpdates.INSTANCE.manager.jsonToStack(null);
+        if (indent == null)
+            indent = NotEnoughUpdates.INSTANCE.manager.jsonToStack(null);
+
         dummyRenderers = new HashMap<>();
         /*try
         {
@@ -63,7 +67,6 @@ public class CityProjectPinOverlay extends TextOverlay {
         dummyRenderers.put("    \u00a7aEnchanted Sugar \u00a7c16\u00a7f/\u00a7232", NotEnoughUpdates.INSTANCE.manager.jsonToStack(NotEnoughUpdates.INSTANCE.manager.getItemInformation().get("ENCHANTED_SUGAR")));
         dummyRenderers.put("    \u00a7fMagical Water Bucket \u00a7216\u00a7f/\u00a728", NotEnoughUpdates.INSTANCE.manager.jsonToStack(NotEnoughUpdates.INSTANCE.manager.getItemInformation().get("MAGICAL_WATER_BUCKET")));
         dummyRenderers.put("    \u00a7aEnchanted Potato \u00a7c60\u00a7f/\u00a7264", NotEnoughUpdates.INSTANCE.manager.jsonToStack(NotEnoughUpdates.INSTANCE.manager.getItemInformation().get("ENCHANTED_POTATO")));
-        dummyRenderers.put("    \u00a7fMagical Water Bucket \u00a7216\u00a7f/\u00a728", NotEnoughUpdates.INSTANCE.manager.jsonToStack(NotEnoughUpdates.INSTANCE.manager.getItemInformation().get("MAGICAL_WATER_BUCKET")));
         dummyRenderers.put("    \u00a7aEnchanted Clownfish \u00a7c2\u00a7f/\u00a724", NotEnoughUpdates.INSTANCE.manager.jsonToStack(NotEnoughUpdates.INSTANCE.manager.getItemInformation().get("ENCHANTED_CLOWNFISH")));
         dummyRenderers.put("    \u00a7aEnchanted Melon \u00a7264\u00a7f/\u00a7264", NotEnoughUpdates.INSTANCE.manager.jsonToStack(NotEnoughUpdates.INSTANCE.manager.getItemInformation().get("ENCHANTED_MELON")));
 
@@ -82,6 +85,8 @@ public class CityProjectPinOverlay extends TextOverlay {
             cont.name = "\u00a7aBuilding & Machinery";
             cont.components.add(new Component("\u00a7aEnchanted Birch Wood", 2));
             cont.components.add(new Component("\u00a7aEnchanted Iron", 1));
+            cont.components.get(0).render = NotEnoughUpdates.INSTANCE.manager.jsonToStack(NotEnoughUpdates.INSTANCE.manager.getItemInformation().get("ENCHANTED_BIRCH_LOG"));
+            cont.components.get(1).render = NotEnoughUpdates.INSTANCE.manager.jsonToStack(NotEnoughUpdates.INSTANCE.manager.getItemInformation().get("ENCHANTED_IRON"));
             dummyProject.contribs.add(cont);
         }
         {
@@ -89,6 +94,8 @@ public class CityProjectPinOverlay extends TextOverlay {
             cont.name = "\u00a7aSugary Drinks";
             cont.components.add(new Component("\u00a7aEnchanted Sugar", 32));
             cont.components.add(new Component("\u00a7fMagical Water Bucket", 8));
+            cont.components.get(0).render = NotEnoughUpdates.INSTANCE.manager.jsonToStack(NotEnoughUpdates.INSTANCE.manager.getItemInformation().get("ENCHANTED_SUGAR"));
+            cont.components.get(1).render = NotEnoughUpdates.INSTANCE.manager.jsonToStack(NotEnoughUpdates.INSTANCE.manager.getItemInformation().get("MAGICAL_WATER_BUCKET"));
             dummyProject.contribs.add(cont);
         }
         {
@@ -96,6 +103,8 @@ public class CityProjectPinOverlay extends TextOverlay {
             cont.name = "\u00a7aSlavic Recipes";
             cont.components.add(new Component("\u00a7aEnchanted Potato", 64));
             cont.components.add(new Component("\u00a7fMagical Water Bucket", 8));
+            cont.components.get(0).render = NotEnoughUpdates.INSTANCE.manager.jsonToStack(NotEnoughUpdates.INSTANCE.manager.getItemInformation().get("ENCHANTED_POTATO"));
+            cont.components.get(1).render = NotEnoughUpdates.INSTANCE.manager.jsonToStack(NotEnoughUpdates.INSTANCE.manager.getItemInformation().get("MAGICAL_WATER_BUCKET"));
             dummyProject.contribs.add(cont);
         }
         {
@@ -103,6 +112,8 @@ public class CityProjectPinOverlay extends TextOverlay {
             cont.name = "\u00a7aLabor";
             cont.components.add(new Component("\u00a7aEnchanted Clownfish", 4));
             cont.components.add(new Component("\u00a7aEnchanted Melon", 64));
+            cont.components.get(0).render = NotEnoughUpdates.INSTANCE.manager.jsonToStack(NotEnoughUpdates.INSTANCE.manager.getItemInformation().get("ENCHANTED_CLOWNFISH"));
+            cont.components.get(1).render = NotEnoughUpdates.INSTANCE.manager.jsonToStack(NotEnoughUpdates.INSTANCE.manager.getItemInformation().get("ENCHANTED_MELON"));
             cont.bitsReq = 100;
             dummyProject.contribs.add(cont);
         }
@@ -118,11 +129,10 @@ public class CityProjectPinOverlay extends TextOverlay {
         if (Minecraft.getMinecraft().thePlayer == null) return;
         EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
 
+        // If the player has something pinned, check their inventory against the materials needed
         if (pin != null)
-        {
             for (Contribute cont : pin.contribs)
                 if (!cont.completed)
-                {
                     for (Component comp : cont.components)
                     {
                         int count = 0;
@@ -131,9 +141,6 @@ public class CityProjectPinOverlay extends TextOverlay {
                                 count += is.stackSize;
                         comp.current = count;
                     }
-
-                }
-        }
     }
 
     @Override
@@ -147,13 +154,13 @@ public class CityProjectPinOverlay extends TextOverlay {
         overlayStrings.add(pin.name);
         for (Contribute cont : pin.contribs)
         {
-            overlayStrings.add("  " + cont.name + (cont.completed ? " \u00a72\u00a7l✓" : ""));
+            overlayStrings.add(cont.name + (cont.completed ? " \u00a72\u00a7l✓" : ""));
             if (!cont.completed)
                 for (Component comp : cont.components)
-                    overlayStrings.add("    " + comp.name + " " + (comp.current >= comp.req ? "\u00a72" : "\u00a7c")
-                            + comp.current + "\u00a7f/\u00a72" + comp.req);
+                    overlayStrings.add(comp.name + " \u00a72" + comp.req + "\u00a7f/" + (comp.current >= comp.req ? "\u00a72" : "\u00a7c")
+                            + comp.current);
             if (cont.bitsReq != -1)
-                overlayStrings.add("    \u00a7b" + cont.bitsReq + " Bits");
+                overlayStrings.add("\u00a7b" + cont.bitsReq + " Bits");
         }
     }
 
@@ -164,25 +171,17 @@ public class CityProjectPinOverlay extends TextOverlay {
             return;
         ItemStack icon = null;
         String clean = Utils.cleanColour(line);
-        String beforeColon = clean.split(":")[0];
+        String beforeSlash = clean.split("/")[0];
 
-        HashMap<String, ItemStack> renderers = null;
         if (dummy)
-        {
-            //icon = NotEnoughUpdates.INSTANCE.manager.jsonToStack(NotEnoughUpdates.INSTANCE.manager.getItemInformation().get("GOD_POTION"));
-            renderers = getDummyRenderers();
-        } else
-        {
-            // Check dynamic map
-        }
-        if (renderers == null)
-            return;
+            icon = getDummyRenderers().getOrDefault(line, null);
+        else
+            icon = scuffedRenderers.getOrDefault(beforeSlash, null);
 
-        icon = renderers.getOrDefault(line, null);
         if (icon != null)
             if (icon == indent)
             {
-                position.x += 2;
+                position.x += 10;
             } else
             {
                 GlStateManager.pushMatrix();
@@ -190,7 +189,55 @@ public class CityProjectPinOverlay extends TextOverlay {
                 GlStateManager.scale(0.5f, 0.5f, 1f);
                 Utils.drawItemStack(icon, 0, 0);
                 GlStateManager.popMatrix();
+                position.x += 10;
             }
+    }
+
+    /**
+     * Set the Player's pin and update the relevent things
+     *
+     * @param inv
+     */
+    public void setPin(IInventory inv)
+    {
+        this.pin = new Project(inv);
+
+        // Search for each item needed, as the City Project Inventory only gives item names
+        for (JsonObject jo : NotEnoughUpdates.INSTANCE.manager.getItemInformation().values())
+        {
+            boolean allMatched = true;
+
+            for (Contribute cont : pin.contribs)
+            {
+                for (Component comp : cont.components)
+                {
+                    if (comp.render != null) continue;
+                    allMatched = false;
+                    if (jo.get("displayname").getAsString().equalsIgnoreCase(comp.name))
+                    {
+                        comp.render = NotEnoughUpdates.INSTANCE.manager.jsonToStack(jo);
+                        break;
+                    }
+                    System.out.println(jo.toString());
+                }
+            }
+
+            if (allMatched)
+                break;
+        }
+
+        // Fake Item used to make bits aligned with other items
+        if (indent == null)
+            indent = NotEnoughUpdates.INSTANCE.manager.jsonToStack(null);
+
+        scuffedRenderers.clear();
+        for (Contribute cont : pin.contribs)
+        {
+            if (cont.bitsReq != -1)
+                scuffedRenderers.put(cont.bitsReq + " Bits", indent);
+            for (Component comp : cont.components)
+                scuffedRenderers.put(Utils.cleanColour(comp.name + " " + comp.req), (comp.render != null ? comp.render : indent));
+        }
     }
 
     public class Project {
@@ -257,7 +304,7 @@ public class CityProjectPinOverlay extends TextOverlay {
                                             String name = lore.substring(0, lore.length() - split[split.length - 1].length()).trim();
                                             String count = split[split.length - 1]
                                                     .split("x")[1];
-                                            c = new Component(name, Integer.valueOf(count));
+                                            c = new Component(name, Integer.parseInt(count));
                                         } else
                                         {
                                             c = new Component(lore.trim(), 1);
